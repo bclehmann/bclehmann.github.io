@@ -1,12 +1,17 @@
 title: "Ben's Blog"
 
+author:
+  name: Benjamin Lehmann
+
 markdown: kramdown
 kramdown:
   math_engine: katex
 
+# Github pages version of jekyll is hilariously out of date and breaks everything
 remote_theme: jekyll/minima
 
 minima:
+  skin: auto
   social_links:
     github: bclehmann
     linkedin: benjamin-lehmann-a87772206
