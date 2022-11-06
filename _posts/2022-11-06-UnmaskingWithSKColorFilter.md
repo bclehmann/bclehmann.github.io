@@ -88,9 +88,9 @@ $$
 
 This matrix can encode an arbitrary affine transformation (i.e. any linear transformation, with the addition of translation). That's why we have a five-dimensional colour, and it's why the matrix has five columns, so we can encode translations as well.
 
-However, we only care what this matrix does to two colours, black and white, which are the vectors $[0, 0, 0, 0, 1]$ and $[1, 1, 1, 1, 1]$ respectively. So we're going to create a matrix that maps these vectors to our hatchColor and backgroundColor, which has the geometric interpretation of placing every shade of gray onto a line between hatchColor and backgroundColor.
+However, we only care what this matrix does to two colours, black and white, which are the vectors \$$[0, 0, 0, 0, 1]$$ and \$$[1, 1, 1, 1, 1]$$ respectively. So we're going to create a matrix that maps these vectors to our hatchColor and backgroundColor, which has the geometric interpretation of placing every shade of gray onto a line between hatchColor and backgroundColor.
 
-We can start by translating all colours by the background colour $\textbf{bg}$. This maps black to $\textbf{bg}$, regardless of what the rest of the matrix looks like, as multiplying by the vector $[0, 0, 0, 0, 1]$ simply extracts the last column:
+We can start by translating all colours by the background colour \$$\textbf{bg}$$. This maps black to \$$\textbf{bg}$$, regardless of what the rest of the matrix looks like, as multiplying by the vector \$$[0, 0, 0, 0, 1]$$ simply extracts the last column:
 
 $$
 \begin{bmatrix}
@@ -114,7 +114,7 @@ $$
 \end{bmatrix}
 $$
 
-Now, we're going to define a vector $\textbf{diff} = \textbf{hatch}- \textbf{bg}$. This vector will form the main diagonal of our matrix, the rest of which will be zero:
+Now, we're going to define a vector \$$\textbf{diff} = \textbf{hatch}- \textbf{bg}$$. This vector will form the main diagonal of our matrix, the rest of which will be zero:
 
 $$
 \begin{bmatrix}
@@ -156,11 +156,11 @@ $$
 c'_a = c_a \cdot diff_a
 $$
 
-We can write this pairwise multiplication more concisely as $\textbf{c}' = \textbf{c} ⊙ \textbf{diff}$
+We can write this pairwise multiplication more concisely as \$$\textbf{c}' = \textbf{c} ⊙ \textbf{diff}$$
 
-Crucially, since the colour white is represented by the vector $[1, 1, 1, 1, 1]$, white maps to $\textbf{diff} + \textbf{bg}$. Since $\textbf{diff} = \textbf{hatch} - \textbf{bg}$, white maps to $\textbf{hatch}$. Now that we have a matrix that maps black to the background colour, and white to the hatch colour, we can start coding.
+Crucially, since the colour white is represented by the vector \$$[1, 1, 1, 1, 1]$$, white maps to \$$\textbf{diff} + \textbf{bg}$$. Since \$$\textbf{diff} = \textbf{hatch} - \textbf{bg}$$, white maps to \$$\textbf{hatch}$$. Now that we have a matrix that maps black to the background colour, and white to the hatch colour, we can start coding.
 
-Note that in this explanation I made a simplifying assumption, namely that colour channels are on the interval $[0, 1]$ rather than $[0, 255]$. This is not true, so we have to divide our matrix by 255.
+Note that in this explanation I made a simplifying assumption, namely that colour channels are on the interval \$$[0, 1]$$ rather than \$$[0, 255]$$. This is not true, so we have to divide our matrix by 255.
 
 ## SKColorFilter implementation
 
