@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function() {
         delimiters: [
             {left: '$$', right: '$$', display: true}, // Block
             {left: '$', right: '$', display: false}, // Inline
+            {left: '\(', right: '\)', display: false}, // Inline (old hack for earlier versions of KaTeX)
+            {left: '\\[', right: '\\]', display: true} // Block (Kramdown emits this for some reason)
         ],
         throwOnError : false
     });
