@@ -5,7 +5,7 @@ title:  "SkiaSharp: Unmasking with SKColorFilter"
 
 In my last [post]({% post_url 2022-11-05-HatchingWithSKShader %}), we created a shader that tiled a bitmap across the filled area. In this post, we're going to change that bitmap to be a black-and-white mask, and use a color filter to change the color on the fly.
 
-Our CreateBitmap method doesn't change much, we simply hardcode the colours to black and white:
+Our `CreateBitmap` method doesn't change much, we simply hardcode the colours to black and white:
 
 ```cs
 private static SKBitmap CreateBitmap()
@@ -25,13 +25,13 @@ private static SKBitmap CreateBitmap()
 public readonly static SKBitmap Bitmap = CreateBitmap();
 ```
 
-Since this function will always return the same thing, we cache the result, which, rather predictably, looks the same, but with the colours swapped:
+Since this function will always return the same thing, we cache the result, which, rather predictably, looks the same but with the colours swapped:
 
-![](https://cdn-images-1.medium.com/max/2000/1*ly1s7o4LPxL0ncfq4NoqUw.png)
+![Alternating black and white stripes going up and to the right](https://cdn-images-1.medium.com/max/2000/1*ly1s7o4LPxL0ncfq4NoqUw.png)
 
-Now, how do we map white to our hatch colour, and black to our background colour? The key is [SKShader.WithColorFilter](https://learn.microsoft.com/en-us/dotnet/api/skiasharp.skshader.withcolorfilter?view=skiasharp-2.88),  which will allow us to remap black and white to blue and red.
+Now, how do we map white to our hatch colour, and black to our background colour? The key is [`SKShader.WithColorFilter`](https://learn.microsoft.com/en-us/dotnet/api/skiasharp.skshader.withcolorfilter?view=skiasharp-2.88), which will allow us to remap black and white to blue and red.
 
-There are two main ways to create such an SKColorFilter. There's a function [SKColorFilter.CreateTable](https://learn.microsoft.com/en-us/dotnet/api/skiasharp.skcolorfilter.createtable?view=skiasharp-2.88#skiasharp-skcolorfilter-createtable(system-byte()-system-byte()-system-byte()-system-byte())) that takes four   byte[256] arrays, which are interpreted as lookup tables for the A, R, G, and B channels respectively. For each colour c in the image, it applies this function:
+There are two main ways to create such an `SKColorFilter`. There's a function [`SKColorFilter.CreateTable`](https://learn.microsoft.com/en-us/dotnet/api/skiasharp.skcolorfilter.createtable?view=skiasharp-2.88#skiasharp-skcolorfilter-createtable(system-byte()-system-byte()-system-byte()-system-byte())) that takes four `byte[256]` arrays, which are interpreted as lookup tables for the A, R, G, and B channels respectively. For each colour c in the image, it applies this function:
 
     c.A = alphaLookup[c.A]
     c.R = redLookup[c.R]
@@ -46,36 +46,121 @@ The second way is to create a 4x5 matrix that all colours in our image will be m
 
 From [this](https://learn.microsoft.com/en-us/xamarin/xamarin-forms/user-interface/graphics/skiasharp/effects/color-filters) article in the Xamarmin docs, the matrix looks like this:
 
-![](https://cdn-images-1.medium.com/max/2000/1*ilysm8PNMH2ls81_cGWobw.png)
+$$
+\begin{bmatrix}
+ \text{M11} & \text{M12} & \text{M13} & \text{M14} & \text{M15} \\
+ \text{M21} & \text{M22} & \text{M23} & \text{M24} & \text{M25} \\
+ \text{M31} & \text{M32} & \text{M33} & \text{M34} & \text{M35} \\
+ \text{M41} & \text{M42} & \text{M43} & \text{M44} & \text{M45} \\
+\end{bmatrix}
+\begin{bmatrix}
+ r \\
+ g \\
+ b \\
+ a \\
+ 1
+\end{bmatrix} = 
+\begin{bmatrix}
+ r' \\
+ g' \\
+ b' \\
+ a' \\
+\end{bmatrix}
+$$
 
 The formulas for each channel are as follows:
 
-![](https://cdn-images-1.medium.com/max/2186/1*mwfZOz_A0RK1Y_KYNxXq5Q.png)
+$$
+r' = \text{M11}·r + \text{M12}·g + \text{M13}·b + \text{M14}·a + \text{M15}
+$$
+
+$$
+g' = \text{M21}·r + \text{M22}·g + \text{M23}·b + \text{M24}·a + \text{M25}
+$$
+
+$$
+b' = \text{M31}·r + \text{M32}·g + \text{M33}·b + \text{M34}·a + \text{M35}
+$$
+
+$$
+a' = \text{M41}·r + \text{M42}·g + \text{M43}·b + \text{M44}·a + \text{M45}
+$$
 
 This matrix can encode an arbitrary affine transformation (i.e. any linear transformation, with the addition of translation). That's why we have a five-dimensional colour, and it's why the matrix has five columns, so we can encode translations as well.
 
-However, we only care what this matrix does to two colours, black and white, which are the vectors [0, 0, 0, 0, 1] and [1, 1, 1, 1, 1] respectively. So we're going to create a matrix that maps these vectors to our hatchColor and backgroundColor, which has the geometric interpretation of placing every shade of gray onto a line between hatchColor and backgroundColor.
+However, we only care what this matrix does to two colours, black and white, which are the vectors $[0, 0, 0, 0, 1]$ and $[1, 1, 1, 1, 1]$ respectively. So we're going to create a matrix that maps these vectors to our hatchColor and backgroundColor, which has the geometric interpretation of placing every shade of gray onto a line between hatchColor and backgroundColor.
 
-We can start by translating all colours by backgroundColor. This maps black to the backgroundColor, regardless of what the rest of the matrix looks like, as multiplying by the vector [0, 0, 0, 0, 1] simply extracts the last column:
+We can start by translating all colours by the background colour $\textbf{bg}$. This maps black to $\textbf{bg}$, regardless of what the rest of the matrix looks like, as multiplying by the vector $[0, 0, 0, 0, 1]$ simply extracts the last column:
 
-![](https://cdn-images-1.medium.com/max/2000/1*LeV2bO-O74AldFs1DxaX_A.png)
+$$
+\begin{bmatrix}
+ \text{M11} & \text{M12} & \text{M13} & \text{M14} & bg_r \\
+ \text{M21} & \text{M22} & \text{M23} & \text{M24} & bg_g \\
+ \text{M31} & \text{M32} & \text{M33} & \text{M34} & bg_b \\
+ \text{M41} & \text{M42} & \text{M43} & \text{M44} & bg_a \\
+\end{bmatrix}
+\begin{bmatrix}
+ 0 \\
+ 0 \\
+ 0 \\
+ 0 \\
+ 1
+\end{bmatrix} = 
+\begin{bmatrix}
+ bg_r \\
+ bg_g \\
+ bg_b \\
+ bg_a \\
+\end{bmatrix}
+$$
 
-Now, we're going to define a vector, diff = hatchColor  ΓÇö  backgroundColor. This vector will form the main diagonal of our matrix, the rest of which will be zero:
+Now, we're going to define a vector $\textbf{diff} = \textbf{hatch}- \textbf{bg}$. This vector will form the main diagonal of our matrix, the rest of which will be zero:
 
-![](https://cdn-images-1.medium.com/max/2000/1*QdFQOFn-tkFrj25IDfi18w.png)
+$$
+\begin{bmatrix}
+ diff_r & 0 & 0 & 0 & bg_r \\
+ 0 & diff_g & 0 & 0 & bg_g \\
+ 0 & 0  & diff_b & 0 & bg_b \\
+ 0 & 0 & 0 & diff_a & bg_a \\
+\end{bmatrix}
+\begin{bmatrix}
+ 0 \\
+ 0 \\
+ 0 \\
+ 0 \\
+ 1
+\end{bmatrix} = 
+\begin{bmatrix}
+ r' \\
+ g' \\
+ b' \\
+ a' \\
+\end{bmatrix}
+$$
 
-You may notice that, save for the last column, this is a diagonal matrix (aka a scaling matrix). Multiplying by a diagonal matrix is equivalent to multiplying the first component of the vector by the first element of the matrix's diagonal, the second component by second element of the diagonal, and so on.
+You may notice that, save for the last column, this is a diagonal matrix (aka a scaling matrix). Multiplying by a diagonal matrix is equivalent to multiplying the first component of the vector by the first element of the matrix's diagonal, the second component by second element of the diagonal, and so on. That is to say:
 
-This means, that for a colour c, multiplying by this matrix is equivalent to the following:
+$$
+c'_r = c_r \cdot diff_r
+$$
 
-    c.R = c.R * diff.R + bg.R
-    c.G = c.G * diff.G + bg.G
-    c.B = c.B * diff.B + bg.B
-    c.A = c.A * diff.A + bg.A
+$$
+c'_g = c_g \cdot diff_g
+$$
 
-Crucially, since the colour white is represented by the vector [1, 1, 1, 1, 1], white maps to diff + backgroundColor. Since diff = hatchColor - backgroundColor, white maps to hatchColor.
+$$
+c'_b = c_b \cdot diff_b
+$$
 
-In this explanation I made a simplifying assumption, that colour channels are on the interval [0, 1] rather than [0, 255]. This is not true, so we have to divide our matrix by 255.
+$$
+c'_a = c_a \cdot diff_a
+$$
+
+We can write this pairwise multiplication more concisely as $\textbf{c}' = \textbf{c} ⊙ \textbf{diff}$
+
+Crucially, since the colour white is represented by the vector $[1, 1, 1, 1, 1]$, white maps to $\textbf{diff} + \textbf{bg}$. Since $\textbf{diff} = \textbf{hatch} - \textbf{bg}$, white maps to $\textbf{hatch}$. Now that we have a matrix that maps black to the background colour, and white to the hatch colour, we can start coding.
+
+Note that in this explanation I made a simplifying assumption, namely that colour channels are on the interval $[0, 1]$ rather than $[0, 255]$. This is not true, so we have to divide our matrix by 255.
 
 ## SKColorFilter implementation
 
@@ -128,7 +213,7 @@ public static SKShader GetShader(SKColor hatchColor, SKColor backgroundColor, St
 
 And this code gives the correct result:
 
-![](https://cdn-images-1.medium.com/max/2000/1*TPCU51q5_33FC9bVIAyB3g.png)
+![Alternating red and blue stripes going up and to the right](https://cdn-images-1.medium.com/max/2000/1*TPCU51q5_33FC9bVIAyB3g.png)
 
 ## Links
 
