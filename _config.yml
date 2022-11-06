@@ -1,5 +1,9 @@
 title: "Ben's Blog"
 
+markdown: kramdown
+kramdown:
+  math_engine: katex
+
 theme: minima
 
 minima:
