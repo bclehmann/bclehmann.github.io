@@ -1,5 +1,7 @@
-
-# SkiaSharp: Hatched fills with SKShader
+---
+layout: post
+title:  "SkiaSharp: Hatched fills with SKShader"
+---
 
 Coming from System.Drawing.Common, one of the things I missed most about SkiaSharp was the lack of support for hatched fills out of the box. If you're unfamiliar, hatching allows you to paint with a pattern applied:
 
@@ -75,7 +77,9 @@ WriteBitmapToFile(bmp, "hatch.png"); // This function is included in the github 
 
 Note that the 2nd and 3rd parameters set the tiling mode for the x and y directions respectively. In our case, we want it to repeat, but if you want it to mirror or clamp in one direction you can. Clamping in this context means displaying the image once and stretching the last pixel to the edge of the fill area.
 
-The last parameter is for applying a transformation to the shader. For now, we just want to rescale it, but soon we'll use it for rotations.
+The last parameter is for applying a transformation to the shader. For now, we just want to rescale it, but next we'll use it for rotations.
+
+## Rotating the shader
 
 Now, what if you want vertical or diagonal stripes? You could rotate the bitmap, but it's simpler to rotate the shader. That way, you can reuse the same bitmap for different rotations.
 
@@ -109,6 +113,8 @@ Now, if we call GetShader with StripeDirection.DiagonalUp, we get this result in
 A quick note on the transformation matrix, when you call A.PostConcat(B) it represents this matrix multiplication A * B. These matrices represent a linear transformation, but matrix multiplication is not commutative. Unintuitively, the multiplication A * B corresponds to B(A(x)).
 
 So while our code might look like it scales the shader followed by a rotation, it actually rotates and then scales. In this case, it doesn't make a difference, but it's worth noting in case you get up to anything more complicated.
+
+## Using a mask and colour filter
 
 For most people's purposes, this is as far as they need to go. But if you're astute, you may have noticed that we baked the colours (in our case red and blue) into the bitmap. What if we need to be able to provide the same pattern with multiple colour palettes, do we have to regenerate the bitmap each time? Or do we have to write extra code to invalidate the bitmap should the colours change?
 
@@ -186,6 +192,8 @@ Crucially, since the colour white is represented by the vector [1, 1, 1, 1, 1], 
 
 In this explanation I made a simplifying assumption, that colour channels are on the interval [0, 1] rather than [0, 255]. This is not true, so we have to divide our matrix by 255.
 
+## SKColorFilter implementation
+
 The code looks like this, note that I used foreground in place of hatchColor 
 
 ```cs
@@ -236,6 +244,8 @@ public static SKShader GetShader(SKColor hatchColor, SKColor backgroundColor, St
 And this code gives the correct result:
 
 ![](https://cdn-images-1.medium.com/max/2000/1*TPCU51q5_33FC9bVIAyB3g.png)
+
+## Links
 
 * Example code on github: [https://github.com/bclehmann/SkiaSharpHatching](https://github.com/bclehmann/SkiaSharpHatching)
 
