@@ -4,7 +4,7 @@ markdown: kramdown
 kramdown:
   math_engine: katex
 
-theme: minima
+remote_theme: jekyll/minima
 
 minima:
   social_links:
