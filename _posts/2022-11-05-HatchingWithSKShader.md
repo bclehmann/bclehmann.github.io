@@ -3,11 +3,9 @@ layout: post
 title:  "SkiaSharp: Hatched fills with SKShader"
 ---
 
-Coming from System.Drawing.Common, one of the things I missed most about SkiaSharp was the lack of support for hatched fills out of the box. If you're unfamiliar, hatching allows you to paint with a pattern applied:
+Coming from System.Drawing.Common, one of the things I missed most about SkiaSharp was the lack of support for hatched fills out of the box. If you're unfamiliar, hatching allows you to paint with a pattern applied (source: https://scottplot.net/cookbook/4.1/category/plottable-bar-graph/#bar-fill-pattern).
 
-![Source: [https://scottplot.net/cookbook/4.1/category/plottable-bar-graph/#bar-fill-pattern](https://scottplot.net/cookbook/4.1/category/plottable-bar-graph/#bar-fill-pattern)](https://cdn-images-1.medium.com/max/2000/0*t16rJbhPb6xLa5vZ.png)
-
-*Source: [https://scottplot.net/cookbook/4.1/category/plottable-bar-graph/#bar-fill-pattern](https://scottplot.net/cookbook/4.1/category/plottable-bar-graph/#bar-fill-pattern)*
+![A bar chart rendered with ScottPlot 4.1. There are three series with different hach patterns applied: Thin stripes, thicker stripes, and a checkerboard pattern.](https://cdn-images-1.medium.com/max/2000/0*t16rJbhPb6xLa5vZ.png)
 
 In SkiaSharp, you have two options:
 
@@ -21,7 +19,7 @@ Additionally, SKPathEffect has some further drawbacks. If you draw a circle with
 
 ## SKShader
 
-So, you've decided to use SKShader? Despite the name, it's really not too hard to use, you don't have to (and to my knowledge, cannot) write shaders from scratch in SkiaSharp. Instead, we're going to create a small bitmap, and use [SKShader.CreateBitmap](https://learn.microsoft.com/en-us/dotnet/api/skiasharp.skshader.createbitmap?view=skiasharp-2.88#skiasharp-skshader-createbitmap(skiasharp-skbitmap-skiasharp-skshadertilemode-skiasharp-skshadertilemode)) to create a shader that tiles it across the fill.
+So, you've decided to use SKShader? Despite the name, it's really not too hard to use, you don't have to (and to my knowledge, cannot) write shaders from scratch in SkiaSharp. Instead, we're going to create a small bitmap, and use [`SKShader.CreateBitmap`](https://learn.microsoft.com/en-us/dotnet/api/skiasharp.skshader.createbitmap?view=skiasharp-2.88#skiasharp-skshader-createbitmap(skiasharp-skbitmap-skiasharp-skshadertilemode-skiasharp-skshadertilemode)) to create a shader that tiles it across the fill.
 
 For a striped hatch, the code to create the bitmap looks like this:
 
@@ -41,9 +39,9 @@ public static SKBitmap CreateBitmap(SKColor hatchColor, SKColor backgroundColor)
 }
 ```
 
-And the bitmap itself (for a hatchColor of red, and a backgroundColor of blue):
+And the bitmap itself is simply `CreateBitmap(SKColors.Red, SKColors.Blue)`:
 
-![](https://cdn-images-1.medium.com/max/2000/1*1Gcz9mKCsd5KAuupZZ9npw.png)
+![A 20px wide stripe of red across the top, followed by 30px of blue](https://cdn-images-1.medium.com/max/2000/1*1Gcz9mKCsd5KAuupZZ9npw.png)
 
 Doesn't look like much, does it? In any case, it's enough to create a striped pattern. Now we have to create a shader:
 
@@ -73,7 +71,7 @@ canvas.DrawRect(new(0, 0, 128, 128), paint);
 WriteBitmapToFile(bmp, "hatch.png"); // This function is included in the github link at the bottom
 ```
 
-![](https://cdn-images-1.medium.com/max/2000/1*B5vXoO3Yrsd62C616Y8opw.png)
+![Alternating red and blue horizontal stripes](https://cdn-images-1.medium.com/max/2000/1*B5vXoO3Yrsd62C616Y8opw.png)
 
 Note that the 2nd and 3rd parameters set the tiling mode for the x and y directions respectively. In our case, we want it to repeat, but if you want it to mirror or clamp in one direction you can. Clamping in this context means displaying the image once and stretching the last pixel to the edge of the fill area.
 
@@ -83,7 +81,7 @@ The last parameter is for applying a transformation to the shader. For now, we j
 
 Now, what if you want vertical or diagonal stripes? You could rotate the bitmap, but it's simpler to rotate the shader. That way, you can reuse the same bitmap for different rotations.
 
-Since the last parameter to SKShader.CreateBitmap was a transformation matrix, we can simply multiply by our desired rotation matrix to get what we want:
+Since the last parameter to `SKShader.CreateBitmap` was a transformation matrix, we can simply multiply by our desired rotation matrix to get what we want:
 
 ```cs
 public static SKShader GetShader(SKColor hatchColor, SKColor backgroundColor, StripeDirection stripeDirection = StripeDirection.Horizontal)
@@ -106,11 +104,11 @@ public static SKShader GetShader(SKColor hatchColor, SKColor backgroundColor, St
 }
 ```
 
-Now, if we call GetShader with StripeDirection.DiagonalUp, we get this result instead:
+Now, if we call `GetShader` with `StripeDirection.DiagonalUp`, we get this result instead:
 
-![](https://cdn-images-1.medium.com/max/2000/1*TPCU51q5_33FC9bVIAyB3g.png)
+![Alternating red and blue stripes going up and to the right](https://cdn-images-1.medium.com/max/2000/1*TPCU51q5_33FC9bVIAyB3g.png)
 
-A quick note on the transformation matrix, when you call A.PostConcat(B) it represents this matrix multiplication A * B. These matrices represent a linear transformation, but matrix multiplication is not commutative. Unintuitively, the multiplication A * B corresponds to B(A(x)).
+A quick note on the transformation matrix, when you call `A.PostConcat(B)` it represents this matrix multiplication `A * B`. These matrices represent a linear transformation, but matrix multiplication is not commutative, so the order matters. Unintuitively, the multiplication `A * B` corresponds to `B(A(x))`, not `A(B(x))`.
 
 So while our code might look like it scales the shader followed by a rotation, it actually rotates and then scales. In this case, it doesn't make a difference, but it's worth noting in case you get up to anything more complicated.
 
@@ -118,7 +116,9 @@ So while our code might look like it scales the shader followed by a rotation, i
 
 For most people's purposes, this is as far as they need to go. But if you're astute, you may have noticed that we baked the colours (in our case red and blue) into the bitmap. What if we need to be able to provide the same pattern with multiple colour palettes, do we have to regenerate the bitmap each time? Or do we have to write extra code to invalidate the bitmap should the colours change?
 
-Instead, we can store the bitmaps as black and white, and then add the colour later. Then we can cache these bitmaps without ever needing to invalidate them. Seeing as they're so small, you could even bundle them with your distribution, should you be so inclined. This is covered in [this]({% post_url 2022-11-06-UnmaskingWithSKColorFilter %}) post.
+Instead, we can store the bitmaps as black and white, and then add the colour later. Then we can cache these bitmaps without ever needing to invalidate them. Seeing as they're so small, you could even bundle them with your distribution, should you be so inclined.
+
+This is covered in [this]({% post_url 2022-11-06-UnmaskingWithSKColorFilter %}) post.
 
 ## Links
 
