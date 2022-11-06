@@ -1,11 +1,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.3/katex.min.css" integrity="sha512-6VMVcy7XQNyarhVuiL50FzpgCFKsyTd6YO93aaQEyET+BNaWvj0IgKR86Bf6+AmWczxAcSnL+JGjo+iStgO1gQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.3/katex.min.js" integrity="sha512-b9IKj4LCNrtCPBhceRcoYOHWW/S2q9fpl7iAJlyxYpykRj1SKM7FE9+E0NEnJ8g8ni47LBr2GuX9qzg/xeuwzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="text/javascript">
-renderMathInElement(document.body, {
-    delimiters: [
-        {left: '$$', right: '$$', display: true}, // Block
-        {left: '$', right: '$', display: false}, // Inline
-    ],
-    throwOnError : false
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: '$$', right: '$$', display: true}, // Block
+            {left: '$', right: '$', display: false}, // Inline
+        ],
+        throwOnError : false
+    });
 });
 </script>
