@@ -3,6 +3,9 @@ title: "Ben's Blog"
 author:
   name: Benjamin Lehmann
 
+description: >
+  The source for this blog is available at github.com/bclehmann/bclehmann.github.io
+
 markdown: kramdown
 kramdown:
   math_engine: katex
