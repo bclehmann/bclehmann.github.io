@@ -10,6 +10,8 @@ markdown: kramdown
 kramdown:
   math_engine: katex
 
+permalink: pretty
+
 # Github pages version of jekyll is hilariously out of date and breaks everything
 remote_theme: jekyll/minima
 
