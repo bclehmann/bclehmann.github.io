@@ -44,6 +44,8 @@ Since our image only has two colours (black and white), you only need to set ind
 
 The second way is to create a 4x5 matrix that all colours in our image will be multiplied by. I used to be a math minor, so I got a little overenthusiastic here. If you want to skip all the math you can jump to the bottom to see the code.
 
+## The Math (copy-pastable code below)
+
 From [this](https://learn.microsoft.com/en-us/xamarin/xamarin-forms/user-interface/graphics/skiasharp/effects/color-filters) article in the Xamarmin docs, the matrix looks like this:
 
 $$
