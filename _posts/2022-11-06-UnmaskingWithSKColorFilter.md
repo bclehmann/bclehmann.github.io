@@ -90,7 +90,7 @@ $$
 
 This matrix can encode an arbitrary affine transformation (i.e. any linear transformation, with the addition of translation). That's why we have a five-dimensional colour, and it's why the matrix has five columns, so we can encode translations as well.
 
-However, we only care what this matrix does to two colours, black and white, which are the vectors $[0, 0, 0, 0, 1]$ and $[1, 1, 1, 1, 1]$ respectively. So we're going to create a matrix that maps these vectors to our hatchColor and backgroundColor, which has the geometric interpretation of placing every shade of gray onto a line between hatchColor and backgroundColor.
+However, we only care what this matrix does to two colours, black and white, which we'll denote the vectors $[0, 0, 0, 0, 1]$ and $[1, 1, 1, 1, 1]$ respectively. So we're going to create a matrix that maps these vectors to our hatchColor and backgroundColor, which has the geometric interpretation of placing every shade of gray onto a line between hatchColor and backgroundColor. Please note that black is actually the vector $[0, 0, 0, 1, 1]$, and we'll correct our result to account for the alpha channel.
 
 We can start by translating all colours by the background colour $\textbf{bg}$. This maps black to $\textbf{bg}$, regardless of what the rest of the matrix looks like, as multiplying by the vector $[0, 0, 0, 0, 1]$ simply extracts the last column:
 
@@ -126,10 +126,10 @@ $$
  0 & 0 & 0 & diff_a & bg_a \\
 \end{bmatrix}
 \begin{bmatrix}
- 0 \\
- 0 \\
- 0 \\
- 0 \\
+ r \\
+ g \\
+ b \\
+ a \\
  1
 \end{bmatrix} = 
 \begin{bmatrix}
@@ -160,9 +160,39 @@ $$
 
 We can write this pairwise multiplication more concisely as $\textbf{c}' = \textbf{c} ⊙ \textbf{diff}$
 
-Crucially, since the colour white is represented by the vector $[1, 1, 1, 1, 1]$, white maps to $\textbf{diff} + \textbf{bg}$. Since $\textbf{diff} = \textbf{hatch} - \textbf{bg}$, white maps to $\textbf{hatch}$. Now that we have a matrix that maps black to the background colour, and white to the hatch colour, we can start coding.
+Crucially, since the colour white is represented by the vector $[1, 1, 1, 1, 1]$, white maps to $\textbf{diff} + \textbf{bg}$. Since $\textbf{diff} = \textbf{hatch} - \textbf{bg}$, white maps to $\textbf{hatch}$.
 
-Note that in this explanation I made a simplifying assumption, namely that colour channels are on the interval $[0, 1]$ rather than $[0, 255]$. This is not true, so we have to divide our matrix by 255.
+Now we have a matrix that maps black to the background colour and white to the hatch colour, but our alpha channel is incorrect. We pretended that black was $[0, 0, 0, 0, 1]$, but it's actually $[0, 0, 0, 1, 1]$. This means that the alpha of the background colour will be the same as the alpha channel of the hatch colour. We can fix this by placing the coefficient for the alpha channel in a different column (for example red) of the matrix:
+
+$$
+\begin{bmatrix}
+ diff_r & 0 & 0 & 0 & bg_r \\
+ 0 & diff_g & 0 & 0 & bg_g \\
+ 0 & 0  & diff_b & 0 & bg_b \\
+ diff_a & 0 & 0 & 0 & bg_a \\
+\end{bmatrix}
+\begin{bmatrix}
+ r \\
+ g \\
+ b \\
+ a \\
+ 1
+\end{bmatrix} = 
+\begin{bmatrix}
+ r' \\
+ g' \\
+ b' \\
+ a' \\
+\end{bmatrix}
+$$
+
+Which changes the alpha channel so that:
+
+$$
+c'_a = c_r \cdot diff_a
+$$
+
+We could've placed it in the blue or green channels as well, the only important part is it must be a channel that is 0 in the colour black, but 1 in the colour white. I also made another simplifying assumption, namely that colour channels are on the interval $[0, 1]$ rather than $[0, 255]$. This is not true, so we also have to divide our matrix by 255 when we write our code.
 
 ## SKColorFilter implementation
 
@@ -180,7 +210,7 @@ public static SKColorFilter GetMaskColorFilter(SKColor foreground, SKColor backg
     redDifference / 255, 0, 0, 0, background.Red / 255.0f,
     0, greenDifference / 255, 0, 0, background.Green / 255.0f,
     0, 0, blueDifference / 255, 0, background.Blue / 255.0f,
-    0, 0, 0, alphaDifference / 255, background.Alpha / 255.0f,
+    alphaDifference / 255, 0, 0, 0, background.Alpha / 255.0f,
   };
 
   return SKColorFilter.CreateColorMatrix(mat);
