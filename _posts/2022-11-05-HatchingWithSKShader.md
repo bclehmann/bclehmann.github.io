@@ -3,7 +3,7 @@ layout: post
 title:  "SkiaSharp: Hatched fills with SKShader"
 ---
 
-Coming from System.Drawing.Common, one of the things I missed most about SkiaSharp was the lack of support for hatched fills out of the box. If you're unfamiliar, hatching allows you to paint with a pattern applied (source: https://scottplot.net/cookbook/4.1/category/plottable-bar-graph/#bar-fill-pattern).
+Coming from System.Drawing.Common, one of the things I missed most about SkiaSharp was the lack of support for hatched fills out of the box. If you're unfamiliar, hatching allows you to paint with a pattern applied (source: [ScottPlot 4.1 docs](https://scottplot.net/cookbook/4.1/category/plottable-bar-graph/#bar-fill-pattern)).
 
 ![A bar chart rendered with ScottPlot 4.1. There are three series with different hach patterns applied: Thin stripes, thicker stripes, and a checkerboard pattern.](https://cdn-images-1.medium.com/max/2000/0*t16rJbhPb6xLa5vZ.png)
 
