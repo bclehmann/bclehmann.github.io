@@ -90,7 +90,7 @@ $$
 
 This matrix can encode an arbitrary affine transformation (i.e. any linear transformation, with the addition of translation). That's why we have a five-dimensional colour, and it's why the matrix has five columns, so we can encode translations as well.
 
-However, we only care what this matrix does to two colours, black and white, which we'll denote the vectors $[0, 0, 0, 0, 1]$ and $[1, 1, 1, 1, 1]$ respectively. So we're going to create a matrix that maps these vectors to our hatchColor and backgroundColor, which has the geometric interpretation of placing every shade of gray onto a line between hatchColor and backgroundColor. Please note that black is actually the vector $[0, 0, 0, 1, 1]$, and we'll correct our result to account for the alpha channel.
+However, we only care what this matrix does to two colours, black and white, which we'll denote the vectors $[0, 0, 0, 0, 1]$ and $[1, 1, 1, 1, 1]$ respectively. So we're going to create a matrix that maps these vectors to our hatchColor and backgroundColor, which has the geometric interpretation of placing every shade of gray onto a line between hatchColor and backgroundColor. Please note that black is actually the vector $[0, 0, 0, 1, 1]$, and we'll correct our result at the end to account for the alpha channel.
 
 We can start by translating all colours by the background colour $\textbf{bg}$. This maps black to $\textbf{bg}$, regardless of what the rest of the matrix looks like, as multiplying by the vector $[0, 0, 0, 0, 1]$ simply extracts the last column:
 
