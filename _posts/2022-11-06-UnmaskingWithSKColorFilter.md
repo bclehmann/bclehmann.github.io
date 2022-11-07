@@ -212,7 +212,7 @@ public static SKShader GetShader(SKColor hatchColor, SKColor backgroundColor, St
 }
 ```
 
-And this code gives the correct result for hatch colour of red, and a background colour of blue:
+And this code gives the correct result for a hatch colour of red, and a background colour of blue:
 
 ![Alternating red and blue stripes going up and to the right](https://cdn-images-1.medium.com/max/2000/1*TPCU51q5_33FC9bVIAyB3g.png)
 
