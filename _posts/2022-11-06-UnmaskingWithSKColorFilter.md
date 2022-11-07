@@ -10,16 +10,16 @@ Our `CreateBitmap` method doesn't change much, we simply hardcode the colours to
 ```cs
 private static SKBitmap CreateBitmap()
 {
-    var bitmap = new SKBitmap(20, 50);
+  var bitmap = new SKBitmap(20, 50);
 
-    using var paint = new SKPaint() { Color = SKColors.White };
-    using var path = new SKPath();
-    using var canvas = new SKCanvas(bitmap);
+  using var paint = new SKPaint() { Color = SKColors.White };
+  using var path = new SKPath();
+  using var canvas = new SKCanvas(bitmap);
 
-    canvas.Clear(SKColors.Black);
-    canvas.DrawRect(new SKRect(0, 0, 20, 20), paint);
+  canvas.Clear(SKColors.Black);
+  canvas.DrawRect(new SKRect(0, 0, 20, 20), paint);
 
-    return bitmap;
+  return bitmap;
 }
 
 public readonly static SKBitmap Bitmap = CreateBitmap();
@@ -33,14 +33,14 @@ Now, how do we map white to our hatch colour, and black to our background colour
 
 There are two main ways to create such an `SKColorFilter`. There's a function [`SKColorFilter.CreateTable`](https://learn.microsoft.com/en-us/dotnet/api/skiasharp.skcolorfilter.createtable?view=skiasharp-2.88#skiasharp-skcolorfilter-createtable(system-byte()-system-byte()-system-byte()-system-byte())) that takes four `byte[256]` arrays, which are interpreted as lookup tables for the A, R, G, and B channels respectively. For each colour c in the image, it applies this function:
 
-    c.A = alphaLookup[c.A]
-    c.R = redLookup[c.R]
-    c.G = greenLookup[c.G]
-    c.B = blueLookup[c.B]
+```
+c.A = alphaLookup[c.A]
+c.R = redLookup[c.R]
+c.G = greenLookup[c.G]
+c.B = blueLookup[c.B]
+```
 
-Since our image only has two colours (black and white), you only need to set index 0 and index 255. For our purposes, this is a little wasteful, as it means allocating a kilobyte for what is a relatively simple filter.
-
-Unfortunately, be it out of concern for performance, or out of heretofore unknown masochism, I did not go with this option, I hope this was a good enough head start if you're interested.
+Since our image only has two colours (black and white), you only need to set index 0 and index 255. For our purposes, this is a little wasteful, as it means allocating a kilobyte for what is a relatively simple filter. Unfortunately, be it out of concern for performance, or out of heretofore unknown masochism, I did not go with this option, I hope this was a good enough head start if you're interested.
 
 The second way is to create a 4x5 matrix that all colours in our image will be multiplied by. I used to be a math minor, so I got a little overenthusiastic here. If you want to skip all the math you can jump to the bottom to see the code.
 
@@ -169,20 +169,19 @@ The code looks like this, note that I used foreground in place of hatchColor
 ```cs
 public static SKColorFilter GetMaskColorFilter(SKColor foreground, SKColor background)
 {
-    float redDifference = foreground.Red - background.Red;
-    float greenDifference = foreground.Green - background.Green;
-    float blueDifference = foreground.Blue - background.Blue;
-    float alphaDifference = foreground.Alpha - background.Alpha;
+  float redDifference = foreground.Red - background.Red;
+  float greenDifference = foreground.Green - background.Green;
+  float blueDifference = foreground.Blue - background.Blue;
+  float alphaDifference = foreground.Alpha - background.Alpha;
 
-    var mat = new float[] {
-        redDifference / 255, 0, 0, 0, background.Red / 255.0f,
-        0, greenDifference / 255, 0, 0, background.Green / 255.0f,
-        0, 0, blueDifference / 255, 0, background.Blue / 255.0f,
-        0, 0, 0, alphaDifference / 255, background.Alpha / 255.0f,
-    };
+  var mat = new float[] {
+    redDifference / 255, 0, 0, 0, background.Red / 255.0f,
+    0, greenDifference / 255, 0, 0, background.Green / 255.0f,
+    0, 0, blueDifference / 255, 0, background.Blue / 255.0f,
+    0, 0, 0, alphaDifference / 255, background.Alpha / 255.0f,
+  };
 
-    var filter = SKColorFilter.CreateColorMatrix(mat);
-    return filter;
+  return SKColorFilter.CreateColorMatrix(mat);
 }
 ```
 
@@ -191,23 +190,23 @@ Now, to actually use this colour filter, GetShader becomes the following:
 ```cs
 public static SKShader GetShader(SKColor hatchColor, SKColor backgroundColor, StripeDirection stripeDirection = StripeDirection.Horizontal)
 {
-    var rotationMatrix = stripeDirection switch
-    {
-        StripeDirection.DiagonalUp => SKMatrix.CreateRotationDegrees(-45),
-        StripeDirection.DiagonalDown => SKMatrix.CreateRotationDegrees(45),
-        StripeDirection.Horizontal => SKMatrix.Identity,
-        StripeDirection.Vertical => SKMatrix.CreateRotationDegrees(90),
-        _ => throw new NotImplementedException(nameof(StripeDirection))
- };
+  var rotationMatrix = stripeDirection switch
+  {
+    StripeDirection.DiagonalUp => SKMatrix.CreateRotationDegrees(-45),
+    StripeDirection.DiagonalDown => SKMatrix.CreateRotationDegrees(45),
+    StripeDirection.Horizontal => SKMatrix.Identity,
+    StripeDirection.Vertical => SKMatrix.CreateRotationDegrees(90),
+    _ => throw new NotImplementedException(nameof(StripeDirection))
+  };
 
-    var shader = SKShader.CreateBitmap(
-        Bitmap,
-        SKShaderTileMode.Repeat,
-        SKShaderTileMode.Repeat,
-        SKMatrix.CreateScale(0.25f, 0.25f)
-           .PostConcat(rotationMatrix));
+  var shader = SKShader.CreateBitmap(
+    Bitmap,
+    SKShaderTileMode.Repeat,
+    SKShaderTileMode.Repeat,
+    SKMatrix.CreateScale(0.25f, 0.25f)
+      .PostConcat(rotationMatrix));
 
-    return shader.WithColorFilter(ColorFilterHelpers.GetMaskColorFilter(hatchColor, backgroundColor));
+  return shader.WithColorFilter(ColorFilterHelpers.GetMaskColorFilter(hatchColor, backgroundColor));
 }
 ```
 

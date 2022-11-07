@@ -26,16 +26,16 @@ For a striped hatch, the code to create the bitmap looks like this:
 ```cs
 public static SKBitmap CreateBitmap(SKColor hatchColor, SKColor backgroundColor)
 {
-    var bitmap = new SKBitmap(20, 50);
+  var bitmap = new SKBitmap(20, 50);
 
-    using var paint = new SKPaint() { Color = hatchColor };
-    using var path = new SKPath();
-    using var canvas = new SKCanvas(bitmap);
+  using var paint = new SKPaint() { Color = hatchColor };
+  using var path = new SKPath();
+  using var canvas = new SKCanvas(bitmap);
 
-    canvas.Clear(backgroundColor);
-    canvas.DrawRect(new SKRect(0, 0, 20, 20), paint);
+  canvas.Clear(backgroundColor);
+  canvas.DrawRect(new SKRect(0, 0, 20, 20), paint);
 
-    return bitmap;
+  return bitmap;
 }
 ```
 
@@ -48,11 +48,11 @@ Doesn't look like much, does it? In any case, it's enough to create a striped pa
 ```cs
 public static SKShader GetShader(SKColor hatchColor, SKColor backgroundColor)
 {
-    return SKShader.CreateBitmap(
-       CreateBitmap(hatchColor, backgroundColor),
-       SKShaderTileMode.Repeat,
-       SKShaderTileMode.Repeat,
-       SKMatrix.CreateScale(0.25f, 0.25f));
+  return SKShader.CreateBitmap(
+    CreateBitmap(hatchColor, backgroundColor),
+    SKShaderTileMode.Repeat,
+    SKShaderTileMode.Repeat,
+    SKMatrix.CreateScale(0.25f, 0.25f));
 }
 ```
 
@@ -64,7 +64,7 @@ using var bmp = new SKBitmap(128, 128);
 using var canvas = new SKCanvas(bmp);
 using var paint = new SKPaint()
 {
-    Shader = shader
+  Shader = shader
 };
 
 canvas.DrawRect(new(0, 0, 128, 128), paint);
@@ -86,21 +86,21 @@ Since the last parameter to `SKShader.CreateBitmap` was a transformation matrix,
 ```cs
 public static SKShader GetShader(SKColor hatchColor, SKColor backgroundColor, StripeDirection stripeDirection = StripeDirection.Horizontal)
 {
-    var rotationMatrix = stripeDirection switch
-    {
-        StripeDirection.DiagonalUp => SKMatrix.CreateRotationDegrees(-45),
-        StripeDirection.DiagonalDown => SKMatrix.CreateRotationDegrees(45),
-        StripeDirection.Horizontal => SKMatrix.Identity,
-        StripeDirection.Vertical => SKMatrix.CreateRotationDegrees(90),
-        _ => throw new NotImplementedException(nameof(StripeDirection))
-    };
+  var rotationMatrix = stripeDirection switch
+  {
+    StripeDirection.DiagonalUp => SKMatrix.CreateRotationDegrees(-45),
+    StripeDirection.DiagonalDown => SKMatrix.CreateRotationDegrees(45),
+    StripeDirection.Horizontal => SKMatrix.Identity,
+    StripeDirection.Vertical => SKMatrix.CreateRotationDegrees(90),
+    _ => throw new NotImplementedException(nameof(StripeDirection))
+  };
 
-    return SKShader.CreateBitmap(
-        CreateBitmap(hatchColor, backgroundColor),
-        SKShaderTileMode.Repeat,
-        SKShaderTileMode.Repeat,
-        SKMatrix.CreateScale(0.25f, 0.25f)
-            .PostConcat(rotationMatrix));
+  return SKShader.CreateBitmap(
+    CreateBitmap(hatchColor, backgroundColor),
+    SKShaderTileMode.Repeat,
+    SKShaderTileMode.Repeat,
+    SKMatrix.CreateScale(0.25f, 0.25f)
+      .PostConcat(rotationMatrix));
 }
 ```
 
