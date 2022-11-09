@@ -20,3 +20,6 @@ minima:
   social_links:
     github: bclehmann
     linkedin: benjamin-lehmann-a87772206
+
+plugins:
+  - jekyll-sitemap
