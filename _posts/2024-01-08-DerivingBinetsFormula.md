@@ -31,7 +31,7 @@ This version is quite simple, but it's also quite uninteresting. However, if one
 
 $$ \begin{bmatrix} F_{n+1} \\ F_n \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} F_{n} \\ F_{n-1} \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix}^n \begin{bmatrix} 1 \\ 0 \end{bmatrix} $$
 
-But we want a more efficient way to compute this, and fortunately we have one. We'll start by finding the eigenvalues of this matrix, which are the roots of the characteristic polynomial:
+This is nice and all, but we want a more efficient way to compute this, not just a more mathy way. Fortunately, we can have both; we'll start by finding the eigenvalues of this matrix, which are the roots of the characteristic polynomial:
 
 $$ p_{\mathbf A}(\lambda) = \begin{vmatrix} 1 - \lambda & 1 \\ 1 & -\lambda \end{vmatrix} $$
 
