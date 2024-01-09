@@ -39,11 +39,15 @@ $$ = \lambda^2 - \lambda - 1 $$
 
 This has roots of $ \frac{1 \pm \sqrt 5}{2} $, which we typically write as $ \varphi $ and $ -\frac{1}{\varphi} $. The corresponding eigenvectors are non-zero solutions to $ (\mathbf A - \lambda \mathbf I)\mathbf{x} = 0 $ for an eigenvalue $ \lambda $. 
 
-We find the eigenvector associated with $ \lambda = \varphi $ by row-reducing $ [\mathbf A - \varphi \mathbf I \: | \: 0]$, yielding the following matrix
+We find the eigenvector associated with $ \lambda = \varphi $ by row-reduction on the following matrix:
+
+$$ \left[\begin{matrix}\mathbf A - \varphi \mathbf I \end{matrix}\right. \left|\begin{matrix} 0 \end{matrix}\right] $$
+
+This is row-equivalent to:
 
 $$ \left[\begin{matrix} 1 & -\varphi \\ 0 & 0 \end{matrix}\right. \left| \begin{matrix} \:0\: \\ \:0\: \end{matrix} \right] $$
 
-This system has the following solution set:
+This matrix encodes a system with the following solution set:
 
 $$ \overrightarrow x = s \begin{bmatrix} \varphi \\ 1 \end{bmatrix} $$
 
