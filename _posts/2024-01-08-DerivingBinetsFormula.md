@@ -34,7 +34,9 @@ $$ \begin{bmatrix} F_{n+1} \\ F_n \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & 0
 But we want a more efficient way to compute this, and fortunately we have one. We'll start by finding the eigenvalues of this matrix, which are the roots of the characteristic polynomial:
 
 $$ p_{\mathbf A}(\lambda) = \begin{vmatrix} 1 - \lambda & 1 \\ 1 & -\lambda \end{vmatrix} $$
+
 $$ = (1 - \lambda) \cdot (-\lambda) - 1 \cdot 1 $$
+
 $$ = \lambda^2 - \lambda - 1 $$
 
 This has roots of $ \frac{1 \pm \sqrt 5}{2} $, which we typically write as $ \varphi $ and $ -\frac{1}{\varphi} $. The corresponding eigenvectors are non-zero solutions to $ (\mathbf A - \lambda \mathbf I)\mathbf{x} = 0 $ for an eigenvalue $ \lambda $. 
@@ -42,6 +44,8 @@ This has roots of $ \frac{1 \pm \sqrt 5}{2} $, which we typically write as $ \va
 We find the eigenvector associated with $ \lambda = \varphi $ by row-reduction on the following matrix:
 
 $$ \left[\begin{matrix}\mathbf A - \varphi \mathbf I \end{matrix}\right. \left|\begin{matrix} 0 \end{matrix}\right] $$
+
+$$ = \left[\begin{matrix} 1 - \varphi & 1 \\ 1 & -\varphi \end{matrix}\right. \left| \begin{matrix} \:0\: \\ \:0\: \end{matrix} \right] $$
 
 This is row-equivalent to:
 
