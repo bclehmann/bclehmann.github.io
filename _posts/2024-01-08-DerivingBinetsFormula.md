@@ -47,7 +47,7 @@ $$ \left[\begin{matrix}\mathbf A - \varphi \mathbf I \end{matrix}\right. \left|\
 
 $$ = \left[\begin{matrix} 1 - \varphi & 1 \\ 1 & -\varphi \end{matrix}\right. \left| \begin{matrix} \:0\: \\ \:0\: \end{matrix} \right] $$
 
-This is row-equivalent to:
+Which is row-equivalent to:
 
 $$ \left[\begin{matrix} 1 & -\varphi \\ 0 & 0 \end{matrix}\right. \left| \begin{matrix} \:0\: \\ \:0\: \end{matrix} \right] $$
 
