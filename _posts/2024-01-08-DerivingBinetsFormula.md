@@ -62,8 +62,11 @@ $$ \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \frac{1}{\sqrt 5}\overrightarrow u - \
 Therefore, if we multiply by $ \mathbf A $ we only need to multiply each coefficient by the respective eigenvalue:
 
 $$ \mathbf A \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \mathbf A (\frac{1}{\sqrt 5}\overrightarrow u - \frac{1}{\sqrt 5}\overrightarrow v) $$
-$$ = \frac{1}{\sqrt 5}\mathbf A \overrightarrow u - \frac{1}{\sqrt 5}\mathbf A \overrightarrow v $$
+
+$$ = \frac{1}{\sqrt 5} \mathbf A \overrightarrow u - \frac{1}{\sqrt 5} \mathbf A \overrightarrow v $$
+
 $$ = \frac{1}{\sqrt 5} \cdot \varphi \cdot \overrightarrow u - \frac{1}{\sqrt 5} \cdot (-\varphi)^{-1} \cdot \overrightarrow v $$
+
 $$ = \frac{\varphi \: \overrightarrow u - (-\varphi)^{-1} \:\: \overrightarrow v}{\sqrt 5} $$
 
 And if we multiply by $ \mathbf A^n $:
