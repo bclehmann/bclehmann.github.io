@@ -80,3 +80,5 @@ $$ \mathbf A^n \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \frac{\varphi^n \: \overri
 This lets us create a closed-form expression by solving for $ F_n $ which if you recall is the *second* element in our vector:
 
 $$ F_n = \frac{\varphi^n - (-\varphi)^{-n}}{\sqrt 5} $$
+
+And so there we have it, we've derived Binet's formula.
