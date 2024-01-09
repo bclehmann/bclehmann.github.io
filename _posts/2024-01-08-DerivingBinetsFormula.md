@@ -75,7 +75,7 @@ $$ = \frac{\varphi \: \overrightarrow u - (-\varphi)^{-1} \:\: \overrightarrow v
 
 And if we multiply by $ \mathbf A^n $:
 
-$$ = \mathbf A^n \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \frac{\varphi^n \: \overrightarrow u - (-\varphi)^{-n} \:\: \overrightarrow v}{\sqrt 5} $$
+$$ \mathbf A^n \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \frac{\varphi^n \: \overrightarrow u - (-\varphi)^{-n} \:\: \overrightarrow v}{\sqrt 5} $$
 
 This lets us create a closed-form expression by solving for $ F_n $ which if you recall is the *second* element in our vector:
 
