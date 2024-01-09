@@ -3,8 +3,6 @@ layout: post
 title:  "Binet's Formula for Fibonacci Numbers and Where it Comes From"
 ---
 
-$$ \DeclareMathOperator{\Nul}{Nul} $$
-
 ## Prologue
 
 If you're like me, you may be a little jaded towards the Golden Ratio and the Fibonacci numbers. If you aren't already, I invite you to search YouTube for videos related to either topic &mdash; I had a look and I was suggested a video entitled 
