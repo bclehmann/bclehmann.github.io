@@ -10,11 +10,18 @@ markdown: kramdown
 kramdown:
   math_engine: katex
 
+permalink: pretty
+
 # Github pages version of jekyll is hilariously out of date and breaks everything
-remote_theme: jekyll/minima
+# We also have to pin a commit hash because this PR bricks CI: https://github.com/jekyll/minima/pull/686
+remote_theme: jekyll/minima@41b97699af658128fa9983e5312ca5516641f335
 
 minima:
   skin: auto
   social_links:
     github: bclehmann
     linkedin: benjamin-lehmann-a87772206
+
+plugins:
+  - jekyll-sitemap
+  - jekyll-feed
